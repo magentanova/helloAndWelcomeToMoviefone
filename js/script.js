@@ -72,9 +72,10 @@ var searchMovies = function(searchTerm) {
     promise.then(handleRetrievedData)
 }
 
-//create a function for the event listener
+
+// create a function for an event listener 
 var handleKeyPress = function(eventObject) {
-    //we need to know whether enter was pressed
+    //we need to know whether enter was pressed| to do this we need to grab the keyboard code for enter
     if (eventObject.keyCode === 13) {
         // get what the user inputted 
         var inputNode = eventObject.target,
@@ -84,6 +85,7 @@ var handleKeyPress = function(eventObject) {
         searchMovies(searchTerm)
     }
 }
-//invoke the eventListener
+
+// set up that event listener to be run when the keydown event fires in the inputNode
 inputNode.addEventListener('keydown', handleKeyPress)
 
