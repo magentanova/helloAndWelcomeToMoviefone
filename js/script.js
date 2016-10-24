@@ -1,28 +1,15 @@
+// verify that I have included the jquery library
+console.log($)
+
+// verify that i have included the Backbone library
+console.log(Backbone)
+
+
 // set a DOM node for the movies-container in HTML
 var moviesContainer = document.querySelector('.movies-container'),
     //set a DOM node for the input div in HTML
     inputNode = document.querySelector('input')
 
-
-// EXAMPLE OF THE STRUCTURE OF THE RESPONSE FROM THE API
-// {
-//   "Search": [
-//     {
-//       "Title": "Robots",
-//       "Year": "2005",
-//       "imdbID": "tt0358082",
-//       "Type": "movie",
-//       "Poster": "https://images-na.ssl-images-amazon.com/images/M/MV5BNDYyNjY1NjY1M15BMl5BanBnXkFtZTcwNjk5MDczMw@@._V1_SX300.jpg"
-//     },
-//     {
-//       "Title": "War of the Robots",
-//       "Year": "1978",
-//       "imdbID": "tt0077640",
-//       "Type": "movie",
-//       "Poster": "http://ia.media-imdb.com/images/M/MV5BMTk0NzA3NzIyOF5BMl5BanBnXkFtZTcwMTYwMDc1NQ@@._V1._CR41,39,270,405_SX89_AL_.jpg_V1_SX300.jpg"
-//     },
-//     ]
-// }
 
 // this function will run when and only when the response comes back from the server|API. 
 // it takes as input the response itself. it iterates over the movie objects in the response,
@@ -69,9 +56,8 @@ var searchMovies = function(searchTerm) {
     // initiates a request to the server. the promise object will manage the progress of the request.
     var promise = $.getJSON(omdbUrl)
     //tell the promise to use our function to process the data once that data becomes available
-    promise.then(handleRetrievedData)
+    return promise
 }
-
 
 // create a function for an event listener 
 var handleKeyPress = function(eventObject) {
@@ -82,9 +68,42 @@ var handleKeyPress = function(eventObject) {
         //assigns a value to searchTerm which === the string we type into the input box
             searchTerm = inputNode.value
         //invoke searchMovies function with our new searchTerm
-        searchMovies(searchTerm)
+        location.hash = 'search/' + searchTerm  
+        inputNode.value = ''
     }
 }
+
+var MovieRouter = Backbone.Router.extend({
+    // define the routes that will navigate the app
+    // properties are hash properties, values are 
+    // names of methods on the router.
+    routes: {
+        "home": "handleHome",
+        "search/:term": "handleQuery",
+        "*default": "routeToHome"
+    },
+
+    //define a handler function for each route
+    handleHome: function() {
+        moviesContainer.innerHTML = '<marquee>HELLO AND WELCOME TO MOVIEFONE</marquee>'
+    },
+
+    handleQuery: function(term) {
+        var promise = searchMovies(term)
+        promise.then(handleRetrievedData)
+    },
+
+    routeToHome: function() {
+        location.hash = 'home'
+    },
+
+    initialize: function() {
+        Backbone.history.start()
+    }
+})
+
+var router = new MovieRouter()
+console.log(router)
 
 // set up that event listener to be run when the keydown event fires in the inputNode
 inputNode.addEventListener('keydown', handleKeyPress)
